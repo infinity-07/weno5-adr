@@ -1,53 +1,53 @@
-# Approximate Dispersion Relation of WENO5-JS and UW5
+# WENO5-JS 与 UW5 格式的近似色散关系分析
 
-MATLAB implementation of the quasi-linear Approximate Dispersion Relation (ADR) analysis for the WENO5-JS and 5th-order upwind (UW5) schemes, reproducing the results of:
+MATLAB 实现的准线性近似色散关系（ADR）分析，适用于 WENO5-JS 和五阶迎风（UW5）格式，复现了以下文献的结果：
 
 > Pirozzoli, S. (2006). *On the spectral properties of shock-capturing schemes*. Journal of Computational Physics, 219(2), 489–497.
 
-## Method
+## 方法
 
-For each reduced wavenumber `φ ∈ (0, π)` supported by a periodic grid of `N` points:
+对周期网格（共 `N` 个格点）中每个约化波数 `φ ∈ (0, π)`：
 
-1. Initialize a single-mode field: `v_j(0) = cos(j·φ)`
-2. Advance the linear advection equation `v_t + a·v_x = 0` for a small time `τ = σ·h/a` (with `σ ≪ 1`) using the target scheme
-3. Compute the DFT and extract the complex amplitude at wavenumber `φ`
-4. Recover the modified wavenumber:
+1. 初始化单模场：`v_j(0) = cos(j·φ)`
+2. 以目标格式推进线性对流方程 `v_t + a·v_x = 0`，时间步长 `τ = σ·h/a`（`σ ≪ 1`）
+3. 计算 DFT，提取波数 `φ` 处的复数振幅
+4. 还原修正波数：
 
 $$\tilde{\phi}(\varphi) = \frac{i}{\sigma} \log\!\left(\frac{\hat{v}(\varphi,\tau)}{\hat{v}(\varphi,0)}\right)$$
 
-- **Re(Φ)** → approximate phase speed (dispersion error)
-- **Im(Φ)** → numerical dissipation (negative = stable)
+- **Re(Φ)** → 近似相速度（色散误差）
+- **Im(Φ)** → 数值耗散（负值表示稳定）
 
-The time integration uses the 3rd-order TVD Runge-Kutta scheme of Shu & Osher. The analytical modified wavenumber of UW5 is also computed as a sanity check.
+时间积分采用 Shu & Osher 的三阶 TVD Runge-Kutta 格式。同时计算 UW5 的解析修正波数作为正确性验证。
 
-## Schemes
+## 格式说明
 
-| Scheme | Description |
-|--------|-------------|
-| **WENO5-JS** | 5th-order WENO with Jiang-Shu smoothness indicators (1996) |
-| **UW5** | 5th-order linear upwind — equivalent to WENO5 with ideal weights frozen |
+| 格式 | 描述 |
+|------|------|
+| **WENO5-JS** | 五阶 WENO 格式，使用 Jiang-Shu 光滑度指示子（1996） |
+| **UW5** | 五阶线性迎风格式，等价于权重固定为理想权重的 WENO5 |
 
-## Requirements
+## 环境要求
 
-- MATLAB R2016b or later (uses local functions in scripts)
+- MATLAB R2016b 或更高版本（脚本中使用了局部函数特性）
 
-## Usage
+## 使用方法
 
 ```matlab
-% All parameters are set at the top of main.m
-N        = 1000;    % number of periodic grid points
-sigma    = 1e-2;    % CFL number for ADR probe step (keep ≪ 1)
-eps_weno = 1e-6;    % WENO5-JS regularization (Jiang-Shu default)
+% 所有参数在 main.m 顶部设置
+N        = 1000;    % 周期网格格点数
+sigma    = 1e-2;    % ADR 探测步的 CFL 数（保持 ≪ 1）
+eps_weno = 1e-6;    % WENO5-JS 正则化参数（Jiang-Shu 默认值）
 
 run('main.m')
 ```
 
-The script prints a sanity-check error between the numerical and analytical UW5 modified wavenumbers, then produces a two-panel figure:
+脚本运行后将输出 UW5 数值与解析修正波数之间的误差（正确性检验），并生成双面板图：
 
-- **Top panel**: dispersion (Re(Φ) vs φ)
-- **Bottom panel**: dissipation (Im(Φ) vs φ)
+- **上面板**：色散关系（Re(Φ) vs φ）
+- **下面板**：耗散关系（Im(Φ) vs φ）
 
-## Reference
+## 参考文献
 
 ```bibtex
 @article{pirozzoli2006spectral,
